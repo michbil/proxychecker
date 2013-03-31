@@ -43,9 +43,25 @@ def wait_for_elements(client,by="",value=""):
     print "Element search failed"
     return None
 
+def getProxyListFile():
 
+    plist = []
 
-def getProxyList():
+    g.get('http://www.proxynova.com/proxy-server-list/?pxl=ea')
+    wait_for_element(g,by='id',value='dl_proxy_list').click()
+    txt = wait_for_element(g,by='css',value='pre').text 
+
+    proxy_list = txt.split('\n')
+
+    for proxy in proxy_list:
+        
+
+        plist.append(proxy)
+        #print proxy
+
+    return plist
+
+def getProxyListHtml():
 
     plist = []
 
@@ -91,9 +107,9 @@ def check(domain, proxy):
 
 domain = sys.argv[1]
 
-proxy_list = getProxyList()
+proxy_list = getProxyListFile()
 
-num_worker_threads = 10
+num_worker_threads = 6
 
 q = Queue()
 success = []
