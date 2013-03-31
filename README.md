@@ -3,7 +3,7 @@ proxychecker
 
 Check list of proxies
 
-Read proxies from 'proxy_list' file and save to 'success' file if works
+find proxy_list on proxynova and check working proxies
 
 Using:
     python checker.py [domain]
