@@ -6,7 +6,17 @@ import pdb
 
 from selenium import webdriver
 
+from Queue import Queue
+
+import threading
+import time
+from datetime import datetime, timedelta
+
 g = webdriver.PhantomJS()
+
+
+
+
 
 def wait_for_element(client,by="",value=""):
 
@@ -39,7 +49,7 @@ def getProxyList():
 
     plist = []
 
-    g.get('http://www.proxynova.com/proxy-server-list/port-8080/')
+    g.get('http://www.proxynova.com/proxy-server-list/?pxl=ea')
     proxy_list = wait_for_elements(g,by='css',value='#tbl_proxy_list tbody tr')
     
 
@@ -57,7 +67,7 @@ def getProxyList():
         else:
             port = port[0]
         plist.append(ip.text+':'+port.text)
-        print ip.text+':'+port.text
+        #print ip.text+':'+port.text
 
     return plist
 
@@ -83,13 +93,26 @@ domain = sys.argv[1]
 
 proxy_list = getProxyList()
 
+num_worker_threads = 10
+
+q = Queue()
 success = []
-for line in proxy_list:
-    pdb.set_trace()
-    if check(domain, line):
-        success.append(line)
-        print(line + ' OK')
-    else :
-        print(line + ' Failed')
-s.writelines(success);
+
+for p in proxy_list:
+    q.put(p)
+
+def worker():
+    while not q.empty():
+        line = q.get()
+        line = line.encode('ascii','ignore')
+        if check(domain, line):
+            success.append(line)
+            print(line + ' OK')
+       # else :
+            #print(line + ' Failed')
+        q.task_done()
+
+for i in range(num_worker_threads):
+            t = threading.Thread(target=worker)
+            t.start()
 
